@@ -1,0 +1,311 @@
+﻿@using JF_Blog.Models
+@model BlogPost
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Material Design Bootstrap</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Bootstrap core CSS -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <!-- Material Design Bootstrap -->
+    <link href="~/Content/mdb.min.css" rel="stylesheet" />
+    <!-- Your custom styles (optional) -->
+    <link href="~/Content/style.min.css" rel="stylesheet" />
+</head>
+
+<body class="grey lighten-3">
+
+    
+    
+    <!--Main layout-->
+    <main class="mt-5 pt-5">
+        <div class="container">
+
+            <!--Section: Post-->
+            <section class="mt-4">
+
+                <!--Grid row-->
+                <div class="row">
+
+                    <!--Grid column-->
+                    <div class="col-md-8 mb-4">
+
+                        <!--Featured Image-->
+                        <div class="card mb-4 wow fadeIn">
+
+                            @*<img src="//mdbootstrap.com/img/Photos/Slides/img%20(144).jpg" class="img-fluid" alt="">*@
+
+                            @if(Model.ImagePath != null)
+                            {
+                                <img class="img-responsive" src="@Model.ImagePath" alt="Image Not Availiable"/>
+                            }
+
+
+                        </div>
+                        <!--/.Featured Image-->
+                        <!--Card-->
+                        <div class="card mb-4 wow fadeIn">
+
+                            <!--Card content-->
+                            <div class="card-body">
+
+                                <p class="h5 my-4">@Model.Title</p>
+                                <hr />
+                                <p>@Html.Raw(Model.BlogPostBody)</p>                                
+
+                            </div>
+
+                        </div>
+                        <!--/.Card-->
+                        <!--Card-->
+                        <div class="card mb-4 wow fadeIn">
+
+                            <div class="card-header font-weight-bold">
+                                <span>About author</span>
+                                
+                            </div>
+
+                            <!--Card content-->
+                            <div class="card-body">
+
+                                <div class="media d-block d-md-flex mt-3">
+                                    <img class="d-flex mb-3 mx-auto z-depth-1" src="https://mdbootstrap.com/img/Photos/Avatars/img (30).jpg"
+                                         alt="Generic placeholder image" style="width: 100px;">
+                                    <div class="media-body text-center text-md-left ml-md-3 ml-0">
+                                        <h5 class="mt-0 font-weight-bold">
+                                            Justin Fisher
+                                        </h5>
+
+                                        Justin Dean Fisher was born in San Diego, CA and has always had a natural affinity for information technology.
+                                        With prior interests in PC/Console gaming; prior backgrounds in IT, Security network systems, and analytics
+                                        and an inherent ability to critically think;
+                                        Mr. Fisher is positioned to excel in any field.
+
+                                        Objective experience includes, but is not limited to :
+                                        -Security Officer/ Professional Security Services Coordinator
+                                        -University of Phoenix Corporate Office at Allied Barton
+                                        -Management/Inventory Control & Auditing Portal for a small business
+                                        -"Soft Mods"(Extension Software)/Gaming PC & Console
+
+                                        Detail oriented, 'fast-paced learner' with a flair from skilled problem solving, Mr. Fisher would make an excellent asset to any company or development team.
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <!--/.Card-->
+                        <!--Comments-->
+                        <div class="card card-comments mb-3 wow fadeIn">
+                            <div class="card-header font-weight-bold">Comments</div>
+                            <div class="card-body">
+                                @foreach (var comment in Model.Comments.OrderByDescending(c => c.Created))
+                                {
+                                    <div class="container">
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Moderator"))
+                                        {
+                                            <div class="row">
+                                                <div class="offset-8 col-4">
+                                                    @Html.ActionLink("Edit", "Edit", "Comments", new { id = comment.Id }, null)                                                    
+                                                    @using (Html.BeginForm("Delete", "Comments", FormMethod.Post, new { id="deleteForm" }))
+                                                    {
+                                                        @Html.AntiForgeryToken()
+                                                        @Html.Hidden("id",comment.Id)
+                                                       <a href="#" id="commentDelete">Delete</a>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                            
+                                        }
+                                                                                <h4>@comment.Author.DisplayName</h4>
+                                        <div class="media">
+                                            <img src="" class="align-self-start mr-3" />
+                                            <div class="media-body">                                                
+                                                <h5>@comment.CommentBody</h5>
+                                                @comment.Created.ToString("MMM dd, yyyy")
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                @*Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount  @Html.PagedListPager(Model, page => Url.Acton("Index", new { page }))*@
+                            </div>
+                        </div>
+                            <!--/.Comments-->
+
+                            <!--Reply-->
+                        @if (User.Identity.IsAuthenticated)
+                        {
+
+                        
+                            <div class="card card-comments mb-3 wow fadeIn">
+                                <div class="card-header font-weight-bold">Leave a Comment</div>
+                                <div class="card-body text-center">
+
+                                    <div id="addComment">
+                                        @using (Html.BeginForm("Create", "Comments", FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.Hidden("BlogPostId", Model.Id)
+                                            @Html.TextArea("CommentBody", new { rows = 10, cols = 60, placeholder = "Add Comment" })
+
+                                            <button type="submit" class="btn btn-sm btn-teal">Add Comment</button>
+                                        }
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        }
+                        <!--/.Reply-->
+
+                    </div>
+                    <!--Grid column-->
+                    <!--Grid column-->
+                    <div class="col-md-4 mb-4">
+
+                        <!--Card: Jumbotron-->
+                        @*<div class="card blue-gradient mb-4 wow fadeIn">*@
+
+                            <!-- Content -->
+                            @*<div class="card-body text-white text-center">*@
+
+                                @*<h4 class="mb-4">
+                                    <strong>Learn Bootstrap 4 with MDB</strong>
+                                </h4>
+                                <p>
+                                    <strong>Best & free guide of responsive web design</strong>
+                                </p>
+                                <p class="mb-4">
+                                    <strong>
+                                        The most comprehensive tutorial for the Bootstrap 4. Loved by over 500 000 users. Video
+                                        and written versions available. Create your own, stunning website.
+                                    </strong>
+                                </p>
+                                <a target="_blank" href="https://mdbootstrap.com/education/bootstrap/" class="btn btn-outline-white btn-md">
+                                    Start
+                                    free tutorial
+                                    <i class="fas fa-graduation-cap ml-2"></i>
+                                </a>*@
+
+                            @*</div>*@
+                            <!-- Content -->
+                        @*</div>*@
+                        <!--Card: Jumbotron-->
+                        <!--Card : Dynamic content wrapper-->
+                        <div class="card mb-4 text-center wow fadeIn">
+
+                            <div class="card-header">Do you want to get informed about new articles?</div>
+
+                            <!--Card content-->
+                            <div class="card-body">
+
+                                <!-- Default form login -->
+                                <form>
+
+                                    <!-- Default input email -->
+                                    <label for="defaultFormEmailEx" class="grey-text">Your email</label>
+                                    <input type="email" id="defaultFormLoginEmailEx" class="form-control">
+
+                                    <br>
+
+                                    <!-- Default input password -->
+                                    <label for="defaultFormNameEx" class="grey-text">Your name</label>
+                                    <input type="text" id="defaultFormNameEx" class="form-control">
+
+                                    <div class="text-center mt-4">
+                                        <button class="btn btn-info btn-md" type="submit">Sign up</button>
+                                    </div>
+                                </form>
+                                <!-- Default form login -->
+
+                            </div>
+
+                        </div>
+                        <!--/.Card : Dynamic content wrapper-->
+                        <!--Card-->
+                        <div class="card mb-4 wow fadeIn">
+
+                            <div class="card-header">Related articles</div>
+
+                            <!--Card content-->
+                            <div class="card-body">
+
+                                <ul class="list-unstyled">
+                                    <li class="media">
+                                        <img class="d-flex mr-3" src="https://mdbootstrap.com/img/Photos/Others/placeholder7.jpg" alt="Generic placeholder image">
+                                        <div class="media-body">
+                                            <a href="">
+                                                <h5 class="mt-0 mb-1 font-weight-bold">List-based media object</h5>
+                                            </a>
+                                            Cras sit amet nibh libero, in gravida nulla (...)
+                                        </div>
+                                    </li>
+                                    <li class="media my-4">
+                                        <img class="d-flex mr-3" src="https://mdbootstrap.com/img/Photos/Others/placeholder6.jpg" alt="An image">
+                                        <div class="media-body">
+                                            <a href="">
+                                                <h5 class="mt-0 mb-1 font-weight-bold">List-based media object</h5>
+                                            </a>
+                                            Cras sit amet nibh libero, in gravida nulla (...)
+                                        </div>
+                                    </li>
+                                    <li class="media">
+                                        <img class="d-flex mr-3" src="https://mdbootstrap.com/img/Photos/Others/placeholder5.jpg" alt="Generic placeholder image">
+                                        <div class="media-body">
+                                            <a href="">
+                                                <h5 class="mt-0 mb-1 font-weight-bold">List-based media object</h5>
+                                            </a>
+                                            Cras sit amet nibh libero, in gravida nulla (...)
+                                        </div>
+                                    </li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+                        <!--/.Card-->
+
+                    </div>
+                    <!--Grid column-->
+
+                </div>
+                <!--Grid row-->
+
+            </section>
+            <!--Section: Post-->
+
+        </div>
+    </main>
+    <!--Main layout-->
+    
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+
+    <script src="~/Scripts/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+
+    <script src="~/Scripts/mdb.min.js"></script>
+    <!-- Initializations -->
+    <script type="text/javascript">
+    // Animations initialization
+        new WOW().init();</script>
+
+    <script>$("#commentDelete").click(function () {
+            $("#deleteForm").submit()
+        });
+
+    </script>
+</body>
+
+
